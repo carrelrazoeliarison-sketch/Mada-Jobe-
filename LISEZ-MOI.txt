@@ -1,0 +1,7 @@
+MADA JOBE — Prototype version 2 (reconstitué)
+
+Ouvrez index.html dans un navigateur pour tester la maquette.
+Cette version est une démonstration locale : elle n'est pas connectée à Supabase,
+les candidatures ne sont pas transmises et les offres sont des exemples.
+Les données de profil et favoris sont enregistrées dans le stockage local du navigateur.
+Ne saisissez pas de données personnelles réelles dans cette maquette.

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MADA JOBE — Le travail à portée de main</title>
+<style>
+:root{--navy:#101d3b;--blue:#203d73;--gold:#f2c14e;--bg:#f3f5fa;--ink:#18233b}
+*{box-sizing:border-box}body{margin:0;font:15px Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--navy);color:white;padding:22px 16px}header .brand{font-size:24px;font-weight:800;letter-spacing:1px}header small{display:block;margin-top:5px;color:#dbe5ff}
+main{max-width:760px;margin:auto;padding:16px}.card{background:white;border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 3px 14px #14264a12}
+h2{font-size:19px;margin:0 0 12px;color:var(--navy)}input,select,textarea,button{font:inherit;padding:12px;border-radius:9px;border:1px solid #ccd3e1;width:100%;margin:5px 0}
+button{background:var(--blue);color:white;border:0;font-weight:700;cursor:pointer}.job{border-top:1px solid #e7eaf0;padding:13px 0}.job b{display:block;font-size:16px}.muted{color:#69758c;font-size:13px}.row{display:flex;gap:8px}.row>*{flex:1}.tag{display:inline-block;background:#eaf0ff;color:#203d73;padding:4px 8px;border-radius:20px;font-size:12px}
+nav{display:flex;gap:6px;flex-wrap:wrap}nav button{width:auto;flex:1;padding:10px 8px}section[hidden]{display:none}
+</style></head>
+<body>
+<header><div class="brand">🇲🇬 MADA JOBE</div><small>Le travail à portée de main</small></header>
+<main>
+<nav><button onclick="show('home')">Accueil</button><button onclick="show('profile')">Mon profil</button><button onclick="show('saved')">Favoris</button><button onclick="show('recruit')">Recruteur</button></nav>
+<section id="home">
+<div class="card"><h2>Trouvez votre prochain emploi</h2><input id="q" placeholder="Métier, entreprise…"><div class="row"><select id="city"><option value="">Toutes les villes</option><option>Antananarivo</option><option>Toamasina</option><option>Mahajanga</option><option>Toliara</option><option>Diego Suarez</option></select><select id="contract"><option value="">Tous les contrats</option><option>CDI</option><option>CDD</option><option>Stage</option><option>Freelance</option></select></div><button onclick="render()">Rechercher</button></div>
+<div class="card"><h2>Offres d'emploi</h2><div id="jobs"></div></div>
+</section>
+<section id="profile" hidden><div class="card"><h2>Mon profil candidat</h2><input id="name" placeholder="Prénom et nom"><input id="email" type="email" placeholder="Adresse e-mail"><input id="phone" placeholder="Téléphone"><textarea id="about" placeholder="Présentez-vous brièvement"></textarea><button onclick="saveProfile()">Enregistrer mon profil</button><p class="muted">Prototype : ces informations restent enregistrées sur cet appareil.</p></div></section>
+<section id="saved" hidden><div class="card"><h2>Mes favoris</h2><div id="favorites"></div></div></section>
+<section id="recruit" hidden><div class="card"><h2>Espace recruteur — démonstration</h2><input id="title" placeholder="Intitulé du poste"><input id="company" placeholder="Entreprise / recruteur"><select id="postcity"><option>Antananarivo</option><option>Toamasina</option><option>Mahajanga</option><option>Toliara</option><option>Diego Suarez</option></select><select id="postcontract"><option>CDI</option><option>CDD</option><option>Stage</option><option>Freelance</option></select><textarea id="desc" placeholder="Description du poste"></textarea><button onclick="postJob()">Prévisualiser l'offre</button><p class="muted">Les offres créées ici sont uniquement des exemples locaux. Elles ne sont pas publiées sur Internet.</p><div id="posted"></div></div></section>
+</main>
+<script>
+const demo=[{id:1,title:"Téléconseiller / Téléconseillère",company:"Entreprise partenaire (exemple)",city:"Antananarivo",contract:"CDI",desc:"Accueil et accompagnement des clients."},{id:2,title:"Assistant administratif",company:"Recrutement Mada (exemple)",city:"Toamasina",contract:"CDD",desc:"Suivi de dossiers et tâches administratives."},{id:3,title:"Stagiaire en commerce",company:"Société locale (exemple)",city:"Mahajanga",contract:"Stage",desc:"Appui à l'équipe commerciale."}];
+let extra=JSON.parse(localStorage.getItem("mj_extra")||"[]"), fav=JSON.parse(localStorage.getItem("mj_fav")||"[]");
+function all(){return [...demo,...extra]}
+function show(id){document.querySelectorAll("main section").forEach(s=>s.hidden=s.id!==id);if(id==="saved")renderFav()}
+function render(){let q=document.getElementById("q").value.toLowerCase(),c=document.getElementById("city").value,t=document.getElementById("contract").value;let a=all().filter(j=>(j.title+j.company+j.desc).toLowerCase().includes(q)&&(!c||j.city===c)&&(!t||j.contract===t));document.getElementById("jobs").innerHTML=a.length?a.map(card).join(""):"Aucune offre correspondante."}
+function card(j){return `<div class="job"><b>${j.title}</b><div>${j.company}</div><p class="muted">${j.city} · ${j.contract}</p><span class="tag">Exemple de démonstration</span><p>${j.desc}</p><div class="row"><button onclick="toggleFav(${j.id})">☆ Favori</button><button onclick="alert('Démonstration uniquement : la candidature en ligne sera activée après connexion au serveur.')">Voir / postuler</button></div></div>`}
+function toggleFav(id){fav=fav.includes(id)?fav.filter(x=>x!==id):[...fav,id];localStorage.setItem("mj_fav",JSON.stringify(fav));render()}
+function renderFav(){document.getElementById("favorites").innerHTML=all().filter(j=>fav.includes(j.id)).map(card).join("")||"Aucun favori pour le moment."}
+function saveProfile(){let p={name:name.value,email:email.value,phone:phone.value,about:about.value};localStorage.setItem("mj_profile",JSON.stringify(p));alert("Profil enregistré sur cet appareil.");}
+function postJob(){let j={id:Date.now(),title:title.value,company:company.value,city:postcity.value,contract:postcontract.value,desc:desc.value};if(!j.title||!j.company){alert("Ajoutez au moins le poste et le recruteur.");return}extra.push(j);localStorage.setItem("mj_extra",JSON.stringify(extra));posted.innerHTML="<b>Offre ajoutée à la démonstration.</b> Elle n'est pas publiée publiquement.";render()}
+render();
+</script></body></html>
